@@ -39,15 +39,15 @@
       const prompt = document.getElementById('prompt').value.trim();
       const responseBox = document.getElementById('response');
       const sendBtn = document.getElementById('sendBtn');
-
+  
       if (!prompt) {
         responseBox.textContent = "Please enter a prompt.";
         return;
       }
-
+  
       sendBtn.disabled = true;
       responseBox.textContent = "Thinking...";
-
+  
       try {
         const res = await fetch('https://58b0-64-224-128-143.ngrok-free.app/ai', {
           method: 'POST',
@@ -60,10 +60,10 @@
             stream: false
           })
         });
-
+  
         if (!res.ok) {
           const errorData = await res.json();
-          responseBox.textContent = Error ${res.status}: ${errorData.detail || "Unknown error"};
+          responseBox.textContent = `Error ${res.status}: ${errorData.detail || "Unknown error"}`;
         } else {
           const data = await res.json();
           responseBox.textContent = data.response || "No response generated.";
@@ -75,5 +75,6 @@
       }
     }
   </script>
+  
 </body>
 </html>
