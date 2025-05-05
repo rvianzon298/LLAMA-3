@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LLaMA 3 Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background-color: #f9f9f9;
+    }
+    textarea {
+      width: 100%;
+      font-size: 16px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    #response {
+      white-space: pre-wrap;
+      background-color: #fff;
+      padding: 1rem;
+      border: 1px solid #ccc;
+      margin-top: 1rem;
+      min-height: 100px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ask LLaMA 3</h1>
+  <textarea id="prompt" rows="5" placeholder="Type your prompt here..."></textarea><br><br>
+  <button id="sendBtn" onclick="sendPrompt()">Send</button>
+
+  <h3>Response:</h3>
+  <div id="response">Waiting for input...</div>
+
+  <script>
+    async function sendPrompt() {
+      const prompt = document.getElementById('prompt').value.trim();
+      const responseBox = document.getElementById('response');
+      const sendBtn = document.getElementById('sendBtn');
+
+      if (!prompt) {
+        responseBox.textContent = "Please enter a prompt.";
+        return;
+      }
+
+      sendBtn.disabled = true;
+      responseBox.textContent = "Thinking...";
+
+      try {
+        const res = await fetch('http://192.168.254.166:8000/ai', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            prompt: prompt,
+            model: 'llama3',
+            stream: false
+          })
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          responseBox.textContent = Error ${res.status}: ${errorData.detail || "Unknown error"};
+        } else {
+          const data = await res.json();
+          responseBox.textContent = data.response || "No response generated.";
+        }
+      } catch (err) {
+        responseBox.textContent = "Failed to connect to server.";
+      } finally {
+        sendBtn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
